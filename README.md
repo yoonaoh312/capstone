@@ -4,7 +4,7 @@
 
 Overview
 
-The Focus Tracking Web Application is a web-based tool that uses TensorFlow.js and PoseNet(potential use) to track users' body movements 
+The Focus Tracking Web Application is a web-based tool that uses TensorFlow.js to track users' body movements 
 and monitor their concentration levels. It calculates a focus score and provides feedback on users' study habits over time, 
 helping them improve productivity.
 
@@ -37,8 +37,8 @@ Implementation
 
 - Tech Stack
 1. Frontend: React, HTML, SCSS
-2. Motion Tracking: TensorFlow.js, PoseNet
-3. Timer Functionality: React state management, setInterval
+2. Motion Tracking: TensorFlow.js
+3. Timer Functionality: React state management, setInterval fucntion
 4. Local Storage: localStorage (for storing and tracking focus data)
 
 - APIs

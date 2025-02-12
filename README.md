@@ -56,6 +56,16 @@ The logo will be at the top left, and there will be a bottom navigation bar with
 Below the navigation bar, there will be a screen with a 'Start' button and a timer that shows how long you have been studying.
 Under the screen, there will be a chart with the focus zone and time to show how much you have improved.
 
+* update Feb 12,
+  
+Previous Concept:
+There is a timer that tracks how long the user studies/works and evaluates the quality of focus.
+It compares the current data to yesterday's or last week's data.
+
+Current Plan:
+Set a goal time (e.g., 2 hours). If the user only focused for 1.5 hours and the focus quality wasn’t good, the feedback will be more detailed. For example:
+"You set a goal of 2 hours, but you studied for 1 hour and 32 minutes, with 1 hour of focused time. You're making progress, but there's room for improvement! Keep pushing yourself I believe you will do better tomorrow!” 
+
 - Data
 1. Focus Data: Stores time spent in the focus zone, focus score, and the user’s position(might not).
 2. User History: Keeps records of the user's focus scores over time to visualize improvement.
@@ -71,3 +81,5 @@ Feb 11-15: Set up the project with React and integrate TensorFlow.js for motion 
 Feb 16-18: Implement the focus zone and focus score calculation. Set up the timer and integrate local storage for tracking focus data.
 Feb 19-20: Create the weekly focus history feature and integrate charting to visualize progress.
 Feb 21-23: Test the app, refine the UI, and fix bugs. Write final documentation and prepare the app for presentation.
+
+

@@ -56,7 +56,8 @@ The logo will be at the top left, and there will be a bottom navigation bar with
 Below the navigation bar, there will be a screen with a 'Start' button and a timer that shows how long you have been studying.
 Under the screen, there will be a chart with the focus zone and time to show how much you have improved.
 
-* update Feb 12,
+
+update Feb 12,
   
 Previous Concept:
 There is a timer that tracks how long the user studies/works and evaluates the quality of focus.

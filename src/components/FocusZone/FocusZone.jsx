@@ -54,13 +54,13 @@ const FocusZone = ({ pose }) => {
 
     let feedback = "";
     if (focusPercentage >= 90) {
-      feedback = "You are amazing! 👏";
+      feedback = "Amazing focus! Keep it up! 👏";
     } else if (focusPercentage >= 80) {
-      feedback = "잘했지만, 조금만 더 힘내요! 💪";
+      feedback = "You're doing great! Just a little more focus! 💪";
     } else if (focusPercentage >= 70) {
-      feedback = "좀 더 노력해야 할 것 같아요! 📖";
+      feedback = "You're making progress! Try to stay on track. 📖";
     } else {
-      feedback = "집중력이 부족해요! 😥";
+      feedback = "Your focus is slipping... Everything okay? 😥";
     }
     setFeedbackMessage(feedback);
     setFocusScore(focusPercentage.toFixed(2));

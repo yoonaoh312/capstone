@@ -6,9 +6,10 @@ const FocusTimer = ({
   inFocus = true,
   setStudyTimeInSeconds,
   setFocusSeconds,
-  setTotalSeconds
+  setTotalSeconds,
+  onTimerComplete, // 모달 열기 위한 콜백, 타이머 완료 시 현재 시간을 전달
 }) => {
-  // FocusTimer 내부에서는 로컬 상태를 사용합니다.
+  // FocusTimer 내부 상태
   const [status, setStatus] = useState("ready"); // "ready", "tracking", "paused", "finished"
   const [totalSec, setTotalSec] = useState(0);
   const [focusSec, setFocusSec] = useState(0);
@@ -34,7 +35,7 @@ const FocusTimer = ({
     return () => clearInterval(intervalRef.current);
   }, [status, inFocus]);
 
-  // 부모에게 상태 전달 (setter 함수가 전달된 경우에만 호출)
+  // 부모에게 상태 전달 (setter 함수가 전달된 경우에만)
   useEffect(() => {
     if (typeof setTotalSeconds === "function") setTotalSeconds(totalSec);
     if (typeof setFocusSeconds === "function") setFocusSeconds(focusSec);
@@ -90,10 +91,25 @@ const FocusTimer = ({
   // 목표 시간 대비 집중 시간 진행률 계산 (최대 100%)
   const progressPercentage = Math.min((focusSec / targetTime) * 100, 100);
 
+  // 진행률 100% 달성 시 타이머 멈추고 부모에 현재 상태 전달
+  useEffect(() => {
+    if (progressPercentage >= 100 && status === "tracking") {
+      handleStop();
+      if (typeof onTimerComplete === "function") {
+        onTimerComplete({
+          totalSec,
+          focusSec,
+          outOfFocusSec,
+          studySec,
+        });
+      }
+    }
+  }, [progressPercentage, status, onTimerComplete, totalSec, focusSec, outOfFocusSec, studySec]);
+
   return (
     <div className="focus-timer-container">
       <h2>Focus Timer</h2>
-      {/* ProgressCircle 컴포넌트 내부에서 목표 시간 입력 필드를 렌더링 */}
+      {/* ProgressCircle 컴포넌트 내부에 목표 시간 입력 필드를 렌더링 */}
       <ProgressCircle
         progress={progressPercentage}
         targetTime={targetTime}
@@ -141,11 +157,10 @@ const FocusTimer = ({
   );
 };
 
-// 기본값으로 부모에서 전달받은 setter들이 없을 경우 빈 함수로 처리
 FocusTimer.defaultProps = {
   setTotalSeconds: () => {},
   setFocusSeconds: () => {},
-  setStudyTimeInSeconds: () => {}
+  setStudyTimeInSeconds: () => {},
 };
 
 export default FocusTimer;

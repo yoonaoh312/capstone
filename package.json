@@ -10,10 +10,20 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@fontsource/space-grotesk": "^5.1.1",
+    "@mui/material": "^6.4.5",
     "@tensorflow-models/posenet": "^2.2.2",
     "@tensorflow/tfjs": "^4.22.0",
+    "chart.js": "^4.4.7",
+    "ra-data-json-server": "^5.5.4",
     "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react-admin": "^5.5.4",
+    "react-chartjs-2": "^5.3.0",
+    "react-dom": "^18.3.1",
+    "recharts": "^2.15.1",
+    "scss": "^0.2.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
@@ -25,6 +35,7 @@
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.16",
     "globals": "^15.14.0",
+    "sass-embedded": "^1.85.0",
     "vite": "^6.0.5"
   }
 }

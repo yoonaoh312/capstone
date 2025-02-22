@@ -1,12 +1,13 @@
 import React from "react";
-import PoseTracking from "./components/PoseTracking/PoseTracking";   
+import { BrowserRouter as Router } from "react-router-dom";
+import AdminPanel from "./admin/AdminPanel/AdminPanel";
+import "./App.scss";
 
 const App = () => {
   return (
-    <div>
-      <h1>Focus Tracker</h1>
-      <PoseTracking />
-    </div>
+    <Router>
+      <AdminPanel />
+    </Router>
   );
 };
 

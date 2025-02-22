@@ -1,0 +1,34 @@
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+button {
+  cursor: pointer;
+}
+
+:root {
+
+  --bg-color: #fcfdf2;      /* 로고 배경과 어울리는 오프 화이트 */
+  --text-color: #666666;    /* 연한 그레이 */
+  --accent-color: #4b5ae4;  /* 로고의 보라색 계열 (예시) */
+
+
+  --font-family: "Space Grotesk", Arial, Helvetica, sans-serif;
+}
+
+body {
+  width: 100%;
+  font-family: var(--font-family);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}

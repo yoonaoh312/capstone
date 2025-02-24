@@ -1,7 +1,23 @@
-.data-list{
+@use "../../styles/partials/global" as *;
+@use "../../styles/partials/mixins" as *;
+@use "../../styles/partials/variables" as *;
+
+.focus-zone {
     position: absolute;
-    top: 200px;
-    left: 20px;
-    z-index: 3;
-    color: black; 
-}
+    left: 26%; 
+    top: 2.5rem;
+    width: 8rem;  
+    height: 8rem;
+    border: 4px solid lime;
+    background-color: rgba(0, 255, 0, 0.2);
+    transition: border 0.3s ease-in-out;
+    z-index: 5;
+    @include tablet {
+      left: 29.17%; 
+      width: 6.25rem; 
+      height: 12.5rem;
+      width: 12.5rem;
+      top: 4.375rem
+    }
+  }
+  

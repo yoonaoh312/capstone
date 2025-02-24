@@ -1,61 +1,153 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PoseTracking from "../../components/PoseTracking/PoseTracking";
 import FocusTimer from "../../components/FocusTimer/FocusTimer";
+import ProgressCircle from "../../components/ProgressCircle/ProgressCircle";
 import FocusFeedback from "../../components/FocusFeedback/FocusFeedback";
-import WeeklyFocusChart from "../WeeklyFocusChart/WeeklyFocusChart";
 import { Box, Card, CardContent, Dialog, Typography, ThemeProvider, Button } from "@mui/material";
 import theme from "../../theme";
-import videoLogo from "../../assets/logo/focusee.mp4"; // focusee.mp4 비디오 파일
-import logo from "../../assets/logo/focusee.png"; // 작은 로고 이미지
+import videoLogo from "../../assets/logos/focusee.mp4";
+import logo from "../../assets/logos/focusee.png";
+import closeicon from "../../assets/icon/close-24px.svg";
+import AverageStudyTime from "../AverageStudyTime/AverageStudyTime";
+import AverageFocusScore from "../AverageFocusScore/AverageFocusScore";
+import FocusStreakChart from "../FocusStreakChart/FocusStreakChart";
 import "./AdminPanel.scss";
 
-// 시간을 "00:00:00" 형식으로 변환하는 함수
-const formatTime = (seconds) => {
-  const h = String(Math.floor(seconds / 3600)).padStart(2, "0");
-  const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, "0");
-  const s = String(seconds % 60).padStart(2, "0");
-  return `${h}:${m}:${s}`;
-};
-
 const AdminPanel = () => {
-  // 시간 관련 상태 (부모)
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalDataType, setModalDataType] = useState("");
   const [inFocus, setInFocus] = useState(false);
   const [studyTimeInSeconds, setStudyTimeInSeconds] = useState(0);
   const [focusSeconds, setFocusSeconds] = useState(0);
   const [totalSeconds, setTotalSeconds] = useState(0);
-  const [openChart, setOpenChart] = useState(false);
-  const [graphModalOpen, setGraphModalOpen] = useState(false);
-  const [modalDataType, setModalDataType] = useState("");
-  // 타이머 완료 시 최종 시간 데이터 저장
-  const [finalTimerStats, setFinalTimerStats] = useState({
-    totalSec: 0,
-    focusSec: 0,
-    outOfFocusSec: 0,
-    studySec: 0,
-  });
-  const [congratsModalOpen, setCongratsModalOpen] = useState(false);
-  // Instructions 모달 상태
   const [instructionsModalOpen, setInstructionsModalOpen] = useState(true);
 
-  // 집중도(%) 계산 (총 시간이 0이면 0%)
-  const progress = totalSeconds ? (focusSeconds / totalSeconds) * 100 : 0;
+  const [targetTime, setTargetTime] = useState(3600);
+  const [averageStudyTime, setAverageStudyTime] = useState(0);
+  const [focusHistory, setFocusHistory] = useState([]);
+  const [averageFocusScore, setAverageFocusScore] = useState(0);
+  const [focusStreak, setFocusStreak] = useState(0);
 
-  // FocusTimer가 100% 달성 시 호출될 콜백 (모달 열기)
-  const handleTimerComplete = (stats) => {
-    setFinalTimerStats(stats);
-    setCongratsModalOpen(true);
+  const goalProgress = Math.min((focusSeconds / targetTime) * 100, 100);
+  const focusQuality =
+    totalSeconds > 0 ? Math.min((focusSeconds / totalSeconds) * 100, 100) : 0;
+
+  const handleTargetChange = (newTargetTimeInSeconds) => {
+    setTargetTime(newTargetTimeInSeconds);
   };
 
-  // 카드 클릭 시 dataType에 따라 모달 열기
   const handleCardClick = (dataType) => {
     setModalDataType(dataType);
-    setGraphModalOpen(true);
+    setModalOpen(true);
   };
+
+  const saveFocusData = async () => {
+    const focusData = {
+      date: new Date().toISOString(),
+      focusedTime: focusSeconds,
+      outOfFocusTime: totalSeconds - focusSeconds,
+      totalTime: totalSeconds,
+      score: Math.round(focusQuality),
+      goalTime: targetTime,
+    };
+
+    try {
+      const response = await fetch("http://localhost:5050/update-focus", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(focusData),
+      });
+      const result = await response.json();
+      if (result.success) {
+        console.log("✅ Focus data saved:", result.data);
+        fetchFocusHistory();
+      } else {
+        console.error("❌ Failed to save focus data");
+      }
+    } catch (error) {
+      console.error("🚨 Error saving focus data:", error);
+    }
+  };
+
+  const fetchFocusHistory = async () => {
+    try {
+      const response = await fetch("http://localhost:5050/focus-history");
+      const result = await response.json();
+      if (result.focusData) {
+        setFocusHistory(result.focusData);
+        const totalFocusedTime = result.focusData.reduce(
+          (sum, entry) => sum + entry.focusedTime,
+          0
+        );
+        const avgStudyTime =
+          result.focusData.length > 0
+            ? totalFocusedTime / result.focusData.length
+            : 0;
+        setAverageStudyTime(avgStudyTime / 60);
+        const totalFocusScore = result.focusData.reduce(
+          (sum, entry) => sum + entry.score,
+          0
+        );
+        const avgFocusScore =
+          result.focusData.length > 0
+            ? totalFocusScore / result.focusData.length
+            : 0;
+        setAverageFocusScore(avgFocusScore);
+      }
+    } catch (error) {
+      console.error("🚨 Error fetching focus history:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchFocusHistory();
+  }, []);
 
   return (
     <ThemeProvider theme={theme}>
       <Box className="admin-panel-container">
-        {/* 로고 영역: focusee.mp4 비디오 사용 */}
+        {/* Instruction Modal */}
+        <Dialog
+          open={instructionsModalOpen}
+          onClose={() => setInstructionsModalOpen(false)}
+          fullScreen
+        >
+          <Box className="modal-content modal-center">
+            <img src={logo} alt="Focusee Logo" className="modal-logo" />
+            <img
+              src={closeicon}
+              alt="close"
+              className="modal-closeicon"
+              onClick={() => setInstructionsModalOpen(false)}
+            />
+            <Typography className="modal-title">
+              Welcome to <strong>FOCUSEE</strong>
+            </Typography>
+            <Typography className="modal-message">
+              Before we start, please ensure:
+              <br /><br />
+              <strong>CHECK YOUR FOCUS ZONE:</strong>
+              <br />
+              Remove distractions and ensure your face is centered.
+              <br />
+              If you're not studying or picking up items, keep outside the focus zone.
+              <br /><br />
+              <strong>FOCUS GOAL & TIMER:</strong>
+              <br />
+              Set your focus goal and timer (6-minute increments).
+              <br />
+              Let's see how focused you are today!
+            </Typography>
+            <Button
+              className="modal-button"
+              onClick={() => setInstructionsModalOpen(false)}
+            >
+              S T A R T
+            </Button>
+          </Box>
+        </Dialog>
+
+        {/* 로고 영역 */}
         <Box className="logo-container">
           <video
             src={videoLogo}
@@ -67,141 +159,80 @@ const AdminPanel = () => {
           />
         </Box>
 
-        {/* 웹캠 & 피드백 오버레이 컨테이너 */}
-        <div className="overlay-container">
-          <PoseTracking onFocusChange={setInFocus} progress={progress} />
-          <FocusFeedback progress={progress} showFeedback={totalSeconds > 0} />
+        {/* 웹캠 영역 */}
+        <div className="webcam-section">
+          <div className="overlay-container">
+            <PoseTracking onFocusChange={setInFocus} progress={goalProgress} />
+            <FocusFeedback
+              focusScore={focusQuality}
+              showFeedback={totalSeconds > 0}
+            />
+          </div>
+          <div className="down-row">
+            <div className="progress-section">
+              <ProgressCircle
+                progress={goalProgress}
+                targetTime={targetTime}
+                handleTargetChange={handleTargetChange}
+              />
+            </div>
+            <div className="timer-section">
+              <FocusTimer
+                inFocus={inFocus}
+                setStudyTimeInSeconds={setStudyTimeInSeconds}
+                setFocusSeconds={setFocusSeconds}
+                setTotalSeconds={setTotalSeconds}
+                targetTime={targetTime}
+                // onStop prop 전달: FocusTimer에서 Stop 버튼이 눌리면 saveFocusData()를 호출
+                onStop={() => saveFocusData()}
+              />
+            </div>
+          </div>
         </div>
-
-        {/* Focus Timer */}
-        <FocusTimer
-          inFocus={inFocus}
-          setStudyTimeInSeconds={setStudyTimeInSeconds}
-          setFocusSeconds={setFocusSeconds}
-          setTotalSeconds={setTotalSeconds}
-          onTimerComplete={handleTimerComplete}
-        />
 
         {/* 카드 영역 */}
         <Box className="card-container">
           <Card className="card" onClick={() => handleCardClick("averageStudyTime")}>
             <CardContent>
-              <Typography className="card-title">
-                Average Study Time (a day)
-              </Typography>
+              <Typography className="card-title">Average Study Time</Typography>
               <Typography className="card-value">
-                {formatTime(studyTimeInSeconds)}
+                {averageStudyTime ? averageStudyTime.toFixed(2) : "0.00"} min
               </Typography>
             </CardContent>
           </Card>
-
           <Card className="card" onClick={() => handleCardClick("averageFocusScore")}>
             <CardContent>
-              <Typography className="card-title">
-                Average Focus Score
-              </Typography>
+              <Typography className="card-title">Average Focus Score</Typography>
               <Typography className="card-value">
-                {progress.toFixed(1)}%
+                {averageFocusScore ? averageFocusScore.toFixed(2) : "0.00"}%
               </Typography>
             </CardContent>
           </Card>
-
-          <Card className="card" onClick={() => handleCardClick("focusGoalAchievement")}>
+          <Card className="card" onClick={() => handleCardClick("focusStreak")}>
             <CardContent>
-              <Typography className="card-title">
-                Average Focus Goal Achievement
-              </Typography>
+              <Typography className="card-title">Focus Streak</Typography>
               <Typography className="card-value">
-                {totalSeconds > 0 ? Math.round((focusSeconds / totalSeconds) * 100) : 0}%
-              </Typography>
-            </CardContent>
-          </Card>
-
-          <Card className="card" onClick={() => handleCardClick("studyStreak")}>
-            <CardContent>
-              <Typography className="card-title">
-                Study Streak
-              </Typography>
-              <Typography className="card-value">
-                5 days
-              </Typography>
-            </CardContent>
-          </Card>
-
-          <Card className="card" onClick={() => handleCardClick("consistency")}>
-            <CardContent>
-              <Typography className="card-title">
-                Consistency
-              </Typography>
-              <Typography className="card-value">
-                85%
+                {focusStreak} days streak
               </Typography>
             </CardContent>
           </Card>
         </Box>
 
-        {/* 주간 포커스 차트 모달 */}
-        <Dialog open={openChart} onClose={() => setOpenChart(false)} fullWidth maxWidth="md">
+        {/* 모달 영역 */}
+        <Dialog open={modalOpen} onClose={() => setModalOpen(false)} fullWidth maxWidth="lg">
           <Box className="modal-content">
-            <Typography className="modal-title">Weekly Focus Chart</Typography>
-            <WeeklyFocusChart />
-          </Box>
-        </Dialog>
-
-        {/* 그래프 모달 (간단 텍스트 모달) */}
-        <Dialog open={graphModalOpen} onClose={() => setGraphModalOpen(false)} fullWidth maxWidth="sm">
-          <Box className="modal-content modal-center">
-            <Typography className="modal-title">[Graph Modal: {modalDataType}]</Typography>
-            <button onClick={() => setGraphModalOpen(false)}>Close</button>
-          </Box>
-        </Dialog>
-
-        {/* 타이머 100% 달성 시 모달 (축하 메시지 및 최종 데이터) */}
-        <Dialog open={congratsModalOpen} onClose={() => setCongratsModalOpen(false)} fullWidth maxWidth="sm">
-          <Box className="modal-content modal-center">
-            <Typography className="modal-title">Congratulations!</Typography>
-            <Typography className="modal-message">You made it 🎉</Typography>
-            <Typography className="modal-info">
-              Total Study Time: {formatTime(finalTimerStats.studySec)}
-            </Typography>
-            <Typography className="modal-info">
-              Total Focus Time: {formatTime(finalTimerStats.focusSec)}
-            </Typography>
-            <Typography className="modal-info">
-              Focus Score:{" "}
-              {finalTimerStats.totalSec > 0
-                ? Math.round((finalTimerStats.focusSec / finalTimerStats.totalSec) * 100)
-                : 0}
-              %
-            </Typography>
-            <button onClick={() => setCongratsModalOpen(false)}>Close</button>
-          </Box>
-        </Dialog>
-
-        {/* Instructions 모달 */}
-        <Dialog open={instructionsModalOpen} onClose={() => setInstructionsModalOpen(false)} fullWidth maxWidth="sm">
-          <Box className="modal-content modal-center">
-            <img src={logo} alt="Focusee Logo" className="modal-logo" />
-            <Typography className="modal-title">Welcome to Focusee!</Typography>
-            <Typography className="modal-message">
-              Before we start, please ensure:
-              <br />
-              1. <strong>CHECK YOUR FOCUS ZONE:</strong>
-              <br />
-              🧐 Remove distractions and ensure your face is centered.
-              <br />
-              🚫 When picking up an item, check if your face leaves the green box.<br />If not, move it further away.
-              <br />
-              2. <strong>FOCUS GOAL & TIMER:</strong>
-              <br />
-              ⏱️ Set your focus goal and timer (6-minute increments).<br />You can adjust them during the session.
-              <br />
-              Let's see how focused you are today!
-            </Typography>
-            <Button className="modal-button" onClick={() => setInstructionsModalOpen(false)}>
-              S T A R T
-            </Button>
-
+            {modalDataType === "averageStudyTime" && (
+              <AverageStudyTime setAverageStudyTime={setAverageStudyTime} />
+            )}
+            {modalDataType === "averageFocusScore" && <AverageFocusScore />}
+            {modalDataType === "focusStreak" && <FocusStreakChart focusHistory={focusHistory} />}
+            <Button onClick={() => setModalOpen(false)}>C L O S E</Button>
+            <img
+              src={closeicon}
+              alt="close"
+              className="modal-closeicon"
+              onClick={() => setModalOpen(false)}
+            />
           </Box>
         </Dialog>
       </Box>

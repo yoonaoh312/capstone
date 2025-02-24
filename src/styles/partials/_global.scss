@@ -1,0 +1,63 @@
+@use "../partials/variables" as *;
+
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  text-decoration: none;
+  cursor: pointer;
+}
+
+button {
+  cursor: pointer;
+}
+
+body {
+  font-family: "Space Grotesk", Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  background-color: $primary-color3;
+}
+
+button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2rem !important;
+  font-weight: bold !important;
+  color: $primary-color3 !important;
+  background-color: $primary-color1 !important;
+  border-radius: 10px !important;
+  padding: 1rem 2rem !important;
+  width: max-content !important;
+  height: 3rem !important;
+  margin: 2rem auto !important;
+  transition: background-color 0.3s ease !important;
+
+  &:hover {
+    background-color: $primary-color2 !important;
+  }
+}
+
+.modal-center {
+  text-align: center;
+}
+
+.modal-closeicon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  cursor: pointer;
+  z-index: 2100; 
+}
+
+#root{
+ 
+  width: 100%;
+ 
+}

@@ -1,9 +1,9 @@
-// 📌 카드 기본 스타일
+
 .card {
     background: #fff;
-    border-radius: 12px;
+    border-radius: .75rem;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 16px;
+    padding: 1rem;
     transition: transform 0.2s ease-in-out;
     cursor: pointer;
   
@@ -11,15 +11,14 @@
       transform: translateY(-5px);
     }
   }
-  
-  // 📌 카드 제목 스타일
+
   .card-title {
-    font-size: 18px;
+    font-size: 1.125rem;
     font-weight: bold;
     color: #333;.chart-container {
   width: 75vw;
   height: auto;
-  padding: 20px;
+  padding: 1.25rem;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -27,39 +26,38 @@
 }
 
 .chart-title {
-  font-size: 24px;
+  font-size: 1.5rem;
   font-weight: bold;
   color: #333;
-  margin-bottom: 20px;
+  margin-bottom: 1.25rem;
   text-align: center;
 }
-    margin-bottom: 8px;
+    margin-bottom: .5rem;
   }
   
-  // 📌 카드 값 스타일 (평균 공부 시간)
+
   .card-value {
-    font-size: 24px;
+    font-size: 1.5rem;
     font-weight: bold;
     color: #4b5ae4;
-    margin-bottom: 16px;
+    margin-bottom: 1rem;
   }
   
-  // 📌 그래프 컨테이너 스타일 (더 큰 그래프)
+
   .chart-container {
     width: 80vw;
     height: auto;
-    padding: 20px;
+    padding: 1.25rem;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
   }
-  
-  // 📌 툴팁 스타일 (Recharts)
+
   .recharts-tooltip-wrapper {
     background: rgba(255, 255, 255, 0.9);
-    border-radius: 6px;
-    padding: 8px;
+    border-radius: .375rem;
+    padding: .5rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   }
   

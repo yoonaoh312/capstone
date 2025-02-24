@@ -16,9 +16,8 @@ const PoseTracking = ({ onFocusChange }) => {
       try {
         const net = await posenet.load();
         setModel(net);
-        console.log("✅ PoseNet 모델 로드 완료!");
       } catch (error) {
-        console.error("❌ PoseNet 모델 로드 실패:", error);
+        console.error("error:", error);
       }
     };
     loadModel();
@@ -34,7 +33,6 @@ const PoseTracking = ({ onFocusChange }) => {
             videoRef.current.play();
             videoRef.current.width = 640;
             videoRef.current.height = 480;
-            console.log("✅ 웹캠 로드 완료!");
 
             if (model) {
               detectPose();
@@ -44,7 +42,7 @@ const PoseTracking = ({ onFocusChange }) => {
           };
         }
       } catch (err) {
-        console.error("❌ 웹캠 로딩 오류:", err);
+        console.error("error:", error);
       }
     };
 
@@ -57,7 +55,7 @@ const PoseTracking = ({ onFocusChange }) => {
     if (!model || !videoRef.current) return;
     const video = videoRef.current;
     if (video.videoWidth === 0 || video.videoHeight === 0) {
-      console.warn("🚨 비디오가 아직 로드되지 않았습니다.");
+      console.warn("It is too early to detect pose. Try again later.");
       return;
     }
     try {
@@ -65,7 +63,7 @@ const PoseTracking = ({ onFocusChange }) => {
       setPose(poseResult);
       drawPose(poseResult);
     } catch (error) {
-      console.error("❌ Pose 감지 오류:", error);
+      console.error("error:", error);
     }
   };
 
@@ -77,7 +75,7 @@ const PoseTracking = ({ onFocusChange }) => {
       if (point.score > 0.5) {
         ctx.beginPath();
         ctx.arc(point.position.x, point.position.y, 5, 0, 2 * Math.PI);
-        ctx.fillStyle = "red";
+        ctx.fillStyle = "lime";
         ctx.fill();
       }
     });

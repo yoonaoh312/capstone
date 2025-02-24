@@ -3,7 +3,7 @@ import PoseTracking from "../../components/PoseTracking/PoseTracking";
 import FocusTimer from "../../components/FocusTimer/FocusTimer";
 import ProgressCircle from "../../components/ProgressCircle/ProgressCircle";
 import FocusFeedback from "../../components/FocusFeedback/FocusFeedback";
-import { Box, Card, CardContent, Dialog, Typography, ThemeProvider, Button } from "@mui/material";
+import { Box, Dialog, Typography, ThemeProvider, Button } from "@mui/material";
 import theme from "../../theme";
 import videoLogo from "../../assets/logos/focusee.mp4";
 import logo from "../../assets/logos/focusee.png";
@@ -11,9 +11,14 @@ import closeicon from "../../assets/icon/close-24px.svg";
 import AverageStudyTime from "../AverageStudyTime/AverageStudyTime";
 import AverageFocusScore from "../AverageFocusScore/AverageFocusScore";
 import FocusStreakChart from "../FocusStreakChart/FocusStreakChart";
+import DecoratedCard from "../DecoratedCard/DecoratedCard";
+import { UilChart } from "@iconscout/react-unicons";
+import { supabase } from "../../supabaseClient";
+import Footer from "../../components/Footer/Footer";
 import "./AdminPanel.scss";
 
 const AdminPanel = () => {
+
   const [modalOpen, setModalOpen] = useState(false);
   const [modalDataType, setModalDataType] = useState("");
   const [inFocus, setInFocus] = useState(false);
@@ -24,13 +29,12 @@ const AdminPanel = () => {
 
   const [targetTime, setTargetTime] = useState(3600);
   const [averageStudyTime, setAverageStudyTime] = useState(0);
-  const [focusHistory, setFocusHistory] = useState([]);
   const [averageFocusScore, setAverageFocusScore] = useState(0);
   const [focusStreak, setFocusStreak] = useState(0);
+  const [focusHistory, setFocusHistory] = useState([]);
 
   const goalProgress = Math.min((focusSeconds / targetTime) * 100, 100);
-  const focusQuality =
-    totalSeconds > 0 ? Math.min((focusSeconds / totalSeconds) * 100, 100) : 0;
+  const focusQuality = totalSeconds > 0 ? Math.min((focusSeconds / totalSeconds) * 100, 100) : 0;
 
   const handleTargetChange = (newTargetTimeInSeconds) => {
     setTargetTime(newTargetTimeInSeconds);
@@ -41,61 +45,71 @@ const AdminPanel = () => {
     setModalOpen(true);
   };
 
-  const saveFocusData = async () => {
-    const focusData = {
-      date: new Date().toISOString(),
-      focusedTime: focusSeconds,
-      outOfFocusTime: totalSeconds - focusSeconds,
-      totalTime: totalSeconds,
-      score: Math.round(focusQuality),
-      goalTime: targetTime,
+  const calculateStreak = (data) => {
+    const formatDate = (dateString) => dateString.split("T")[0];
+    const isConsecutiveDay = (prevDateStr, currentDateStr) => {
+      const prevDate = new Date(prevDateStr);
+      const currentDate = new Date(currentDateStr);
+      const oneDay = 24 * 60 * 60 * 1000;
+      return currentDate - prevDate === oneDay;
     };
 
-    try {
-      const response = await fetch("http://localhost:5050/update-focus", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(focusData),
-      });
-      const result = await response.json();
-      if (result.success) {
-        console.log("✅ Focus data saved:", result.data);
-        fetchFocusHistory();
+    const filtered = data
+      .filter((entry) => entry.score >= 90)
+      .map((entry) => ({ ...entry, date: formatDate(entry.date) }));
+
+    filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    let streak = 0;
+    let maxStreakLocal = 0;
+    let previousDate = null;
+
+    filtered.forEach((entry) => {
+      if (!previousDate) {
+        streak = 1;
       } else {
-        console.error("❌ Failed to save focus data");
+        streak = isConsecutiveDay(previousDate, entry.date) ? streak + 1 : 1;
       }
-    } catch (error) {
-      console.error("🚨 Error saving focus data:", error);
-    }
+      previousDate = entry.date;
+      if (streak > maxStreakLocal) maxStreakLocal = streak;
+    });
+    setFocusStreak(maxStreakLocal);
   };
 
   const fetchFocusHistory = async () => {
-    try {
-      const response = await fetch("http://localhost:5050/focus-history");
-      const result = await response.json();
-      if (result.focusData) {
-        setFocusHistory(result.focusData);
-        const totalFocusedTime = result.focusData.reduce(
-          (sum, entry) => sum + entry.focusedTime,
-          0
-        );
-        const avgStudyTime =
-          result.focusData.length > 0
-            ? totalFocusedTime / result.focusData.length
-            : 0;
-        setAverageStudyTime(avgStudyTime / 60);
-        const totalFocusScore = result.focusData.reduce(
-          (sum, entry) => sum + entry.score,
-          0
-        );
-        const avgFocusScore =
-          result.focusData.length > 0
-            ? totalFocusScore / result.focusData.length
-            : 0;
-        setAverageFocusScore(avgFocusScore);
-      }
-    } catch (error) {
-      console.error("🚨 Error fetching focus history:", error);
+    const { data, error } = await supabase.from("focus_data").select("*");
+
+    if (error) {
+      console.error("Error fetching focus history:", error);
+    } else if (data) {
+      setFocusHistory(data);
+      const totalFocusedTime = data.reduce((sum, entry) => sum + entry.focused_time, 0);
+      const avgStudyTime = data.length > 0 ? totalFocusedTime / data.length : 0;
+      setAverageStudyTime(avgStudyTime / 60);
+      const totalFocusScore = data.reduce((sum, entry) => sum + entry.score, 0);
+      const avgFocusScore = data.length > 0 ? totalFocusScore / data.length : 0;
+      setAverageFocusScore(avgFocusScore);
+      calculateStreak(data);
+    }
+  };
+
+  const saveFocusData = async () => {
+    const focusData = {
+      date: new Date().toISOString().split("T")[0],
+      focused_time: focusSeconds,
+      out_of_focus_time: totalSeconds - focusSeconds,
+      total_time: totalSeconds,
+      score: Math.round(focusQuality),
+      goal_time: targetTime,
+    };
+
+    const { data, error } = await supabase.from("focus_data").insert([focusData]);
+
+    if (error) {
+      console.error("Error saving focus data:", error);
+    } else {
+      console.log("Focus data saved:", data);
+      fetchFocusHistory();
     }
   };
 
@@ -106,7 +120,6 @@ const AdminPanel = () => {
   return (
     <ThemeProvider theme={theme}>
       <Box className="admin-panel-container">
-        {/* Instruction Modal */}
         <Dialog
           open={instructionsModalOpen}
           onClose={() => setInstructionsModalOpen(false)}
@@ -138,35 +151,20 @@ const AdminPanel = () => {
               <br />
               Let's see how focused you are today!
             </Typography>
-            <Button
-              className="modal-button"
-              onClick={() => setInstructionsModalOpen(false)}
-            >
+            <Button className="modal-button" onClick={() => setInstructionsModalOpen(false)}>
               S T A R T
             </Button>
           </Box>
         </Dialog>
 
-        {/* 로고 영역 */}
         <Box className="logo-container">
-          <video
-            src={videoLogo}
-            autoPlay
-            muted
-            loop
-            playsInline
-            className="logo-video"
-          />
+          <video src={videoLogo} autoPlay muted loop playsInline className="logo-video" />
         </Box>
 
-        {/* 웹캠 영역 */}
         <div className="webcam-section">
           <div className="overlay-container">
             <PoseTracking onFocusChange={setInFocus} progress={goalProgress} />
-            <FocusFeedback
-              focusScore={focusQuality}
-              showFeedback={totalSeconds > 0}
-            />
+            <FocusFeedback focusScore={focusQuality} showFeedback={totalSeconds > 0} />
           </div>
           <div className="down-row">
             <div className="progress-section">
@@ -183,59 +181,48 @@ const AdminPanel = () => {
                 setFocusSeconds={setFocusSeconds}
                 setTotalSeconds={setTotalSeconds}
                 targetTime={targetTime}
-                // onStop prop 전달: FocusTimer에서 Stop 버튼이 눌리면 saveFocusData()를 호출
                 onStop={() => saveFocusData()}
               />
             </div>
           </div>
         </div>
 
-        {/* 카드 영역 */}
         <Box className="card-container">
-          <Card className="card" onClick={() => handleCardClick("averageStudyTime")}>
-            <CardContent>
-              <Typography className="card-title">Average Study Time</Typography>
-              <Typography className="card-value">
-                {averageStudyTime ? averageStudyTime.toFixed(2) : "0.00"} min
-              </Typography>
-            </CardContent>
-          </Card>
-          <Card className="card" onClick={() => handleCardClick("averageFocusScore")}>
-            <CardContent>
-              <Typography className="card-title">Average Focus Score</Typography>
-              <Typography className="card-value">
-                {averageFocusScore ? averageFocusScore.toFixed(2) : "0.00"}%
-              </Typography>
-            </CardContent>
-          </Card>
-          <Card className="card" onClick={() => handleCardClick("focusStreak")}>
-            <CardContent>
-              <Typography className="card-title">Focus Streak</Typography>
-              <Typography className="card-value">
-                {focusStreak} days streak
-              </Typography>
-            </CardContent>
-          </Card>
+          <DecoratedCard
+            title="Average Study Time"
+            value={averageStudyTime ? averageStudyTime.toFixed(2) + " min" : "0.00 min"}
+            icon={UilChart}
+            onClick={() => handleCardClick("averageStudyTime")}
+          />
+          <DecoratedCard
+            title="Average Focus Score"
+            value={averageFocusScore ? averageFocusScore.toFixed(2) + "%" : "0.00 %"}
+            icon={UilChart}
+            onClick={() => handleCardClick("averageFocusScore")}
+          />
+          <DecoratedCard
+            title="Over 90% Focus Streak"
+            value={focusStreak > 0 ? `${focusStreak} days` : "0 days"}
+            icon={UilChart}
+            onClick={() => handleCardClick("focusStreak")}
+          />
         </Box>
 
-        {/* 모달 영역 */}
         <Dialog open={modalOpen} onClose={() => setModalOpen(false)} fullWidth maxWidth="lg">
           <Box className="modal-content">
             {modalDataType === "averageStudyTime" && (
               <AverageStudyTime setAverageStudyTime={setAverageStudyTime} />
             )}
             {modalDataType === "averageFocusScore" && <AverageFocusScore />}
-            {modalDataType === "focusStreak" && <FocusStreakChart focusHistory={focusHistory} />}
+            {modalDataType === "focusStreak" && (
+              <FocusStreakChart onStreakCalculated={(streak) => setFocusStreak(streak)} />
+            )}
             <Button onClick={() => setModalOpen(false)}>C L O S E</Button>
-            <img
-              src={closeicon}
-              alt="close"
-              className="modal-closeicon"
-              onClick={() => setModalOpen(false)}
-            />
+            <img src={closeicon} alt="close" className="modal-closeicon" onClick={() => setModalOpen(false)} />
           </Box>
         </Dialog>
       </Box>
+      <Footer />
     </ThemeProvider>
   );
 };

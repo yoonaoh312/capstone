@@ -7,10 +7,10 @@ const FocusTimer = ({
   setFocusSeconds = () => {},
   setTotalSeconds = () => {},
   onTimerComplete,
-  onStop, // 종료 시 호출할 콜백 prop 추가
+  onStop, 
   targetTime,
 }) => {
-  const [status, setStatus] = useState("ready"); // "ready", "tracking", "paused", "finished"
+  const [status, setStatus] = useState("ready"); 
   const [totalSec, setTotalSecLocal] = useState(0);
   const [focusSec, setFocusSecLocal] = useState(0);
   const [outOfFocusSec, setOutOfFocusSec] = useState(0);
@@ -59,7 +59,7 @@ const FocusTimer = ({
   const handleStop = () => {
     clearInterval(intervalRef.current);
     setStatus("finished");
-    // onStop 콜백 호출: 종료 시점에 데이터를 AdminPanel로 전달하거나 저장하도록 처리할 수 있음
+    
     if (typeof onStop === "function") {
       onStop({ totalSec, focusSec, outOfFocusSec, studySec });
     }

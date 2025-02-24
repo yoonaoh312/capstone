@@ -1,4 +1,3 @@
-// FocusStreakCard.js
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, Typography, Popover, IconButton } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info';
@@ -21,7 +20,7 @@ const isConsecutiveDay = (prevDateStr, currentDateStr) => {
   return currentDate - prevDate === oneDay;
 };
 
-const FocusStreakChart = () => {
+const FocusStreakChart = ({ onStreakCalculated }) => {
   const [focusHistory, setFocusHistory] = useState([]);
   const [maxStreak, setMaxStreak] = useState(0);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -60,6 +59,8 @@ const FocusStreakChart = () => {
       if (streak > maxStreakLocal) maxStreakLocal = streak;
     });
     setMaxStreak(maxStreakLocal);
+
+    if (onStreakCalculated) onStreakCalculated(maxStreakLocal);
   };
 
   useEffect(() => {

@@ -13,20 +13,21 @@ const AverageStudyTime = ({ setAverageStudyTime }) => {
         const result = await response.json();
 
         if (result.focusData) {
+    
           const convertedData = result.focusData.map((entry) => ({
             ...entry,
-            // focusedTime를 초에서 분으로 변환하고 소수점 2자리까지 반올림
-            focusedTime: Number((entry.focusedTime / 60).toFixed(2)),
+            focusedTime: Number((entry.focused_time / 60).toFixed(2))
           }));
 
           setFocusData(convertedData);
 
+
           const totalFocusedTime = result.focusData.reduce(
-            (sum, entry) => sum + entry.focusedTime,
+            (sum, entry) => sum + entry.focused_time,
             0
           );
           const avgTime = result.focusData.length > 0 ? totalFocusedTime / result.focusData.length : 0;
-          // 평균 공부시간을 분에서 시간으로 변환하려면, 아래와 같이 조정 가능
+      
           setAverageStudyTime(avgTime / 60);
         }
       } catch (error) {

@@ -1,0 +1,44 @@
+@use "../../styles/partials/global" as *;
+@use "../../styles/partials/mixins" as *;
+@use "../../styles/partials/variables" as *;
+
+.footer {
+    text-align: center;
+    margin-top: 2rem;
+    padding: 1rem 0;
+    background-color: $primary-color3;
+    width: 100%;
+    display: flex;
+    flex-direction: column; 
+    align-items: center;
+    gap: 1rem;
+
+    
+    @include tablet {
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    a {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    video {
+        width: 12.5rem;
+        height: 12.5rem;
+        
+
+
+        @include tablet {
+            width: 12rem; 
+            height: 12rem;
+        }
+
+        @include desktop {
+            width: 16rem;
+            height: 16rem;  
+        }
+    }
+}

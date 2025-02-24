@@ -9,7 +9,6 @@
   width: 100%;
 }
 
-/* 로고 영역 */
 .logo-container {
   display: flex;
   justify-content: center;
@@ -25,20 +24,19 @@
   }
 }
 .logo-video {
-    width: 18rem; // 모바일 기본 사이즈
+    width: 18rem; 
     height: auto;
     
     @include tablet {
-      width: 30rem; // 태블릿 사이즈
+      width: 30rem; 
     }
     
     @include desktop {
-      width: 40rem; // 데스크탑 사이즈 (필요에 따라 조정)
+      width: 40rem; 
     }
   }
   
 
-/* 웹캠 영역 */
 .webcam-section {
   display: flex;
   flex-direction: column;
@@ -63,17 +61,33 @@
 
 .down-row {
     display: flex;
+    flex-direction: column; 
+    align-items: center;
     justify-content: center;
-    align-items: center; 
-    flex-direction: column;
     gap: 2rem;
     margin-top: 1rem;
     width: 100%;
+  
     @include tablet {
-      flex-direction: row;
+      flex-direction: row; 
       align-items: center;
+      margin-bottom: 3rem;
     }
   }
+  
+  .progress-circle-container {
+    position: relative;
+    width: 9.375rem;
+    height: 9.375rem;
+    margin: 5rem 0; 
+  
+    @include tablet {
+      margin: 0 3rem;
+      margin-bottom: 7rem;
+    }
+  }
+  
+  
   
 
 .progress-section,
@@ -84,12 +98,12 @@
   align-items: center;
 }
 
-/* 카드 영역 */
+
 .card-container {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 15px;
+  gap: .9375rem;
   margin-top: 0.5rem;
   @include tablet {
     flex-wrap: nowrap;
@@ -97,12 +111,12 @@
   }
 }
 
-/* 카드 스타일 */
+
 .card {
   width: 12rem;
   height: 10rem;
   background: linear-gradient(135deg, $primary-color1 0%, $primary-color2 100%);
-  color: white;
+  color: $primary-color4;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -114,7 +128,6 @@
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   @include tablet {
     width: 12rem;
-    height: 8rem;
   }
   @include desktop {
     width: 16rem;
@@ -131,18 +144,18 @@
   .card-value {
     font-weight: 600;
     font-size: 1.6rem;
-    margin-top: 5px;
+    margin-top: .3125rem;
     @include tablet {
       font-size: 1.3rem;
     }
   }
 }
 
-/* 모달 스타일 */
+
 .modal-content {
   background-color: $primary-color3;
   width: 90%;
-  max-width: 600px;
+  max-width: 37.5rem;
   border-radius: 10px;
   padding: 3rem;
   text-align: center;
@@ -157,7 +170,7 @@
 .modal-title {
   font-weight: bold;
   font-size: 2rem;
-  margin-bottom: 16px;
+  margin-bottom: 1rem;
   color: #333;
 }
 
@@ -169,36 +182,20 @@
 }
 
 .modal-logo {
-  width: 250px;
-  height: auto;
-}
+    display: block;
+    margin: 0 auto;
+    width: 100%;
+    height: auto;
+  }
 
 .modal-closeicon {
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: .625rem;
+  right: .625rem;
   cursor: pointer;
   z-index: 2100;
 }
 
-// .modal-button {
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-//   font-size: 1.2rem !important;
-//   font-weight: bold !important;
-//   color: $primary-color3 !important;
-//   background-color: $primary-color1 !important;
-//   border-radius: 10px !important;
-//   padding: 1rem 2rem !important;
-//   width: fit-content !important;
-//   height: 3rem !important;
-//   margin: 2rem auto !important;
-//   transition: background-color 0.3s ease !important;
-//   &:hover {
-//     background-color: $primary-color2 !important;
-//   }
-// }
 
 .modal-center {
   text-align: center;

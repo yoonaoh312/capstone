@@ -6,7 +6,7 @@
 .decorated-card {
   width: 12rem;
   height: 10rem;
-  border-radius: .9375rem;
+  border-radius: 0.9375rem;
   padding: 1rem;
   background: linear-gradient(145deg, $primary-color1, color.adjust($primary-color1, $lightness: -10%));
   color: $primary-color3; 
@@ -21,6 +21,11 @@
   &:hover {
     transform: translateY(-5px);
     box-shadow: 4px 8px 15px rgba(0, 0, 0, 0.3);
+  }
+
+  .icon {
+    font-size: 40px;
+    color: $primary-color2;
   }
 
   .card-title {

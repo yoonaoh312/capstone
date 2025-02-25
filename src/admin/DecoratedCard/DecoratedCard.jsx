@@ -1,13 +1,16 @@
 import React from 'react';
 import { Card, CardContent, Typography } from '@mui/material';
-import { UilChart } from '@iconscout/react-unicons';
+import ShowChartIcon from '@mui/icons-material/ShowChart';
 import './DecoratedCard.scss';
 
-const DecoratedCard = ({ title, value, icon: IconComponent, onClick }) => {
+const DecoratedCard = ({ title, value, onClick }) => {
   return (
     <Card className="card decorated-card" onClick={onClick}>
       <CardContent style={{ textAlign: 'center' }}>
-        {IconComponent && <IconComponent size="40" color="#ecf0f1" />}
+        {/*
+          아이콘에 className="icon"을 부여하여 SCSS에서 스타일링할 수 있도록 합니다.
+        */}
+        <ShowChartIcon className="icon" />
         <Typography className="card-title" style={{ marginTop: '0.5rem' }}>
           {title}
         </Typography>

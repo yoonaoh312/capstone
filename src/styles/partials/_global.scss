@@ -61,3 +61,8 @@ button {
   width: 100%;
  
 }
+
+.modal-content {
+  max-height: 80vh; 
+  overflow-y: auto;
+}

@@ -42,3 +42,10 @@
         }
     }
 }
+
+.github-video{
+    padding-right: 1.2rem;
+    @include tablet {
+    padding-right: 0;
+    }
+}

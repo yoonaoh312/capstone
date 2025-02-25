@@ -10,6 +10,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
+import "./FocusStreakChart.scss"
 
 const formatDate = (dateString) => dateString.split('T')[0];
 
@@ -80,15 +81,21 @@ const FocusStreakChart = ({ onStreakCalculated }) => {
 
   return (
     <>
-      <Card onClick={handleClick} style={{ cursor: 'pointer' }}>
+     <Card onClick={handleClick} style={{ cursor: 'pointer' }}>
         <CardContent>
           <Typography variant="h6">Focus Streak</Typography>
           <Typography variant="h4">{maxStreak} days</Typography>
-          <IconButton size="small" onClick={handleClick}>
-            <InfoIcon fontSize="small" />
-          </IconButton>
+          <div className="focus-info">
+            <IconButton size="small" onClick={handleClick}>
+              <InfoIcon fontSize="small" />
+            </IconButton>
+            <Typography variant="h8" gutterBottom>
+              For mobile users, the complete graph is viewable on screens with a minimum width of 500px.
+            </Typography>
+          </div>
         </CardContent>
       </Card>
+
       <Popover
         id={popoverId}
         open={openPopover}

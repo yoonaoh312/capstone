@@ -4,7 +4,7 @@
 
 .admin-panel-container {
   background-color: $primary-color3;
-  padding: 1rem; // 전체 여백 축소
+  padding: 1rem; 
   margin: 0 auto;
   width: 100%;
 }
@@ -114,7 +114,7 @@
 
 .card {
   width: 12rem;
-  height: 10rem;
+  height: 12rem;
   background: linear-gradient(135deg, $primary-color1 0%, $primary-color2 100%);
   color: $primary-color4;
   display: flex;
@@ -131,7 +131,6 @@
   }
   @include desktop {
     width: 16rem;
-    height: 10rem;
   }
   &:hover {
     transform: scale(1.05);

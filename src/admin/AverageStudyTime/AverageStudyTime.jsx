@@ -13,14 +13,12 @@ const AverageStudyTime = ({ setAverageStudyTime }) => {
         const result = await response.json();
 
         if (result.focusData) {
-    
           const convertedData = result.focusData.map((entry) => ({
             ...entry,
             focusedTime: Number((entry.focused_time / 60).toFixed(2))
           }));
 
           setFocusData(convertedData);
-
 
           const totalFocusedTime = result.focusData.reduce(
             (sum, entry) => sum + entry.focused_time,
@@ -48,7 +46,8 @@ const AverageStudyTime = ({ setAverageStudyTime }) => {
           <ResponsiveContainer width="80%" height="80%">
             <AreaChart data={focusData} margin={{ top: 20, right: 30, left: 10, bottom: 20 }}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" tickFormatter={(tick) => tick.split("T")[0]} />
+              {/* Modified tick formatter to display only month and day */}
+              <XAxis dataKey="date" tickFormatter={(tick) => tick.split("T")[0].substring(5)} />
               <YAxis label={{ value: "Minutes", angle: -90, position: "insideLeft" }} />
               <Tooltip />
               <Area 
@@ -61,6 +60,9 @@ const AverageStudyTime = ({ setAverageStudyTime }) => {
             </AreaChart>
           </ResponsiveContainer>
         </div>
+        <Typography variant="h8" gutterBottom>
+          For mobile users, the complete graph is viewable on screens with a minimum width of 500px.
+        </Typography>
       </CardContent>
     </Card>
   );
